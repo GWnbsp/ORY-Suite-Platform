@@ -1,0 +1,3 @@
+namespaces:
+  - name: Permission
+  - name: Role

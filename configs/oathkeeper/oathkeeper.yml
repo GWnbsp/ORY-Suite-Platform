@@ -1,0 +1,103 @@
+serve:
+  proxy:
+    cors:
+      enabled: true
+      allowed_origins:
+        - "*"
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - Content-Type
+      allow_credentials: true
+      debug: true
+
+errors:
+  fallback:
+    - json # 默认错误处理为json格式
+
+  handlers:
+    redirect:
+      enabled: true # 启用重定向错误处理
+      config:
+        to: http://127.0.0.1:3000/login # 重定向目标
+        when:
+          - error:
+              - unauthorized # 当错误为未授权或禁止访问时
+              - forbidden
+            request:
+              header:
+                accept:
+                  - text/html # 当请求头接受类型为text/html时
+    json:
+      enabled: true # 启用json错误处理
+      config:
+        verbose: true # 详细错误信息
+
+access_rules:
+  matching_strategy: glob
+  repositories:
+    - file:///etc/config/oathkeeper/access-rules.yml
+
+# 认证器配置
+authenticators:
+  anonymous:
+    enabled: true # 启用匿名认证
+    config:
+      subject: guest # 匿名用户的主体
+
+  cookie_session:
+    enabled: true # 启用cookie会话认证
+    config:
+      check_session_url: http://kratos:4433/sessions/whoami # 检查会话URL
+      preserve_path: true # 保留路径
+      extra_from: "@this" # 额外信息来源
+      subject_from: "identity.id" # 主体来源
+      only:
+        - ory_kratos_session # 仅限于ory_kratos_session
+
+  noop:
+    enabled: true # 启用noop认证
+
+# 授权器配置
+authorizers:
+  allow:
+    enabled: true # 启用允许授权
+
+  remote_json:
+    enabled: true # 启用远程JSON授权
+    config:
+      remote: http://keto:4466/check # 远程检查URL
+      payload: |
+        { } # 发送的负载
+      forward_response_headers_to_upstream:
+        - X-Foo # 转发的响应头
+      retry:
+        max_delay: 1s # 最大延迟
+        give_up_after: 1s # 放弃时间
+
+# 变更器配置
+mutators:
+  noop:
+    enabled: true # 启用noop变更器
+  id_token:
+    enabled: true
+    config:
+      issuer_url: http://127.0.0.1:4455/
+      jwks_url: file:///etc/config/oathkeeper/id_token.jwks.json
+      claims: |
+        {
+          "session": {{ .Extra | toJson }}
+        }
+  header:
+    enabled: true # 启用头变更器
+    config:
+      headers:
+        X-User: "{{ print .Subject }}" # 设置X-User头为主体
+

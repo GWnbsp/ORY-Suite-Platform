@@ -1,0 +1,119 @@
+- id: "ory:kratos:public"
+  upstream:
+    preserve_host: true
+    url: "http://kratos:4433"
+    strip_path: /.ory/kratos/admin
+  match:
+    url: "http://127.0.0.1:3000/.ory/kratos/public/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: "ory:kratos:admin"
+  upstream:
+    preserve_host: true
+    url: "http://kratos:4433"
+    strip_path: /.ory/kratos/admin
+  match:
+    url: "http://127.0.0.1:3000/.ory/kratos/admin/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: "ory:hydra:public"
+  upstream:
+    preserve_host: true
+    url: "http://hydra:4445"
+    strip_path: /.hydra
+  match:
+    url: "http://127.0.0.1:3000/.hydra/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: "ory:hydra:admin"
+  upstream:
+    preserve_host: true
+    url: "http://hydra:4445"
+    strip_path: /.hydra
+  match:
+    url: "http://127.0.0.1:3000/.hydra/admin/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: "ory:keto:public"
+  upstream:
+    preserve_host: true
+    url: "http://keto:4466"
+    strip_path: /.keto
+  match:
+    url: "http://127.0.0.1:3000/.keto/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: "ory:keto:admin"
+  upstream:
+    preserve_host: true
+    url: "http://keto:4466"
+    strip_path: /.keto
+  match:
+    url: "http://127.0.0.1:3000/.keto/admin/<**>"
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
