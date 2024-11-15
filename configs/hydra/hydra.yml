@@ -4,21 +4,12 @@ serve:
     # 设置 Cookie 的 SameSite 属性为 Lax 模式，以增强安全性。Lax 模式允许跨站请求时携带 Cookie，但仅限于导航到顶级上下文（例如点击链接）。
 
 urls:
+  login: http://127.0.0.1:3000/login
+  consent: http://127.0.0.1:3000/consent
+  logout: http://127.0.0.1:3000/logout
+  registration: http://127.0.0.1:3000/registration
   self:
     issuer: http://127.0.0.1:4444
-    # 发行人 URL，用于标识当前的 Hydra 实例
-  consent:
-    url: http://127.0.0.1:3000/consent
-    # 同意页面的 URL，用户在此页面上同意或拒绝 OAuth2 请求
-  login:
-    url: http://127.0.0.1:3000/login
-    # 登录页面的 URL，用户在此页面上进行登录
-  registration:
-    url: http://127.0.0.1:3000/registration
-    # 注册页面的 URL，用户在此页面上进行注册
-  logout:
-    url: http://127.0.0.1:3000/logout
-    # 登出页面的 URL，用户在此页面上进行登出
 
 secrets:
   system:

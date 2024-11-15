@@ -64,15 +64,61 @@ git clone https://github.com/GWnbsp/ORY-Suite-Platform.git
 cd ORY-Suite-Platform
 
 # 启动服务
-docker-compose up -d
+docker compose --env-file ../config/development.env up
+
+# 停止服务
+docker compose --env-file ../config/development.env down
+
+# 停止服务并格式化数据库
+docker compose --env-file ../config/development.env down -v
+
 ```
 
 ### 验证安装
 
 ```bash
-# 检查服务状态
-docker-compose ps
+# 检查容器状态：
+docker compose --env-file ../config/development.env ps
 
+# 验证数据库初始化：
+# 连接到 postgres 容器
+docker exec -it ory-dev_postgres psql -U postgres
+
+# 查看数据库列表
+\l
+
+# 验证扩展安装
+\c ory-kratos
+\dx
+
+\c ory-hydra
+\dx
+
+\c ory-keto
+\dx
+
+# 验证服务健康状态：
+# Kratos 健康检查
+curl http://localhost:4433/health/alive
+
+# Hydra 健康检查
+curl http://localhost:4444/health/alive
+
+# Keto 健康检查
+curl http://localhost:4466/health/alive
+
+# Oathkeeper 健康检查
+curl http://localhost:4456/health/alive
+
+# 检查日志：
+# 查看所有服务日志
+docker compose --env-file ../config/development.env logs
+
+# 查看特定服务日志
+docker compose --env-file ../config/development.env logs kratos
+docker compose --env-file ../config/development.env logs hydra
+docker compose --env-file ../config/development.env logs keto
+docker compose --env-file ../config/development.env logs oathkeepe
 ```
 
 ## 组件说明
