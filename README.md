@@ -205,7 +205,7 @@ A: 确认各服务的 URL 配置是否正确
 
 ## 许可证
 
-Apache License 2.0
+本项目采用 Apache License 2.0 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件
 
 ## 联系方式
 
