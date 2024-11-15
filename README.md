@@ -19,6 +19,7 @@
 
 ## 项目结构
 
+```
 .
 ├── docker/ # Docker 相关配置
 │ ├── compose/ # Docker Compose 文件
@@ -44,16 +45,18 @@
 ├── components.md # 组件说明
 └── examples.md # 示例教程
 
-````
+```
 
 ## 快速开始
 
 ### 前置条件
+
 - Docker 20.10+
 - Docker Compose 2.0+
 - Git
 
 ### 基础安装
+
 ```bash
 # 克隆项目
 git clone https://github.com/GWnbsp/ORY-Suite-Platform.git
@@ -63,7 +66,7 @@ cd ORY-Suite-Platform
 
 # 启动服务
 docker-compose up -d
-````
+```
 
 ### 验证安装
 
