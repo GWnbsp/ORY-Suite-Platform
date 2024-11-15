@@ -227,6 +227,43 @@ services:
     networks:
       - intranet
 
+  # Vue 前端界面服务
+  vue-ui:
+    # 构建配置
+    build:
+      context: ./vue # 构建上下文目录
+      dockerfile: Dockerfile # 使用的 Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_vue_ui # 容器名称
+    ports:
+      - "3000:3000" # 映射端口到宿主机
+    networks:
+      - intranet # 使用内部网络
+    depends_on:
+      - oathkeeper # 依赖于 oathkeeper 服务
+    # 健康检查配置
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
+      interval: 10s # 检查间隔
+      timeout: 5s # 超时时间
+      retries: 5 # 重试次数
+    restart: unless-stopped # 容器重启策略
+    # 资源限制配置
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5" # CPU 使用限制
+          memory: 512M # 内存使用限制
+        reservations:
+          memory: 256M # 内存预留
+
   postgres:
     container_name: ${COMPOSE_PROJECT_NAME}_postgres
     image: postgres:14-alpine
