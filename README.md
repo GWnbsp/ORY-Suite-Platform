@@ -20,7 +20,6 @@
 ## 项目结构
 
 ```
-.
 ├── docker/ # Docker 相关配置
 │ ├── compose/ # Docker Compose 文件
 │ └── config/ # 容器配置文件
