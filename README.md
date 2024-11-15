@@ -74,6 +74,44 @@ docker compose --env-file ../config/development.env down -v
 
 ```
 
+### 使用脚本安装
+
+我们提供了两个辅助脚本来简化安装和测试过程：
+
+#### 1. 环境设置脚本 (setup.sh)
+
+```bash
+# 添加执行权限
+chmod +x scripts/setup.sh
+
+# 运行设置脚本
+./scripts/setup.sh
+```
+
+该脚本会：
+
+- 创建必要的目录结构
+- 设置正确的权限
+- 启动开发环境
+- 验证服务健康状态
+
+#### 2. 测试脚本 (test.sh)
+
+```bash
+# 添加执行权限
+chmod +x scripts/test.sh
+
+# 运行测试脚本
+./scripts/test.sh
+```
+
+该脚本会：
+
+- 启动测试环境
+- 运行基本的健康检查测试
+- 验证数据库初始化
+- 完成后自动清理测试环境
+
 ### 验证安装
 
 ```bash
