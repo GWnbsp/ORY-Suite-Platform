@@ -143,20 +143,37 @@ cd examples/permissions
 主要的环境变量配置：
 
 ```env
+# Database
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres_dev
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+
 # Kratos
-KRATOS_ADMIN_URL=http://kratos:4434
-KRATOS_PUBLIC_URL=http://kratos:4433
+KRATOS_DSN=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/ory-kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+KRATOS_LOG_LEVEL=debug
+KRATOS_LOG_FORMAT=json
 
 # Hydra
-HYDRA_ADMIN_URL=http://hydra:4445
-HYDRA_PUBLIC_URL=http://hydra:4444
+HYDRA_DSN=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/ory-hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+HYDRA_LOG_LEVEL=debug
+HYDRA_LOG_FORMAT=json
 
 # Keto
-KETO_READ_URL=http://keto:4466
-KETO_WRITE_URL=http://keto:4467
+KETO_DSN=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/ory-keto?sslmode=disable&max_conns=20&max_idle_conns=4
+KETO_LOG_LEVEL=debug
+KETO_LOG_FORMAT=json
 
 # Oathkeeper
-OATHKEEPER_API_URL=http://oathkeeper:4456
+OATHKEEPER_LOG_LEVEL=debug
+OATHKEEPER_LOG_FORMAT=json
+
+# Docker Compose Project Name
+COMPOSE_PROJECT_NAME=ory-dev
+
+# Development Mode
+DEV_MODE=true
+
 ```
 
 ## 开发指南
