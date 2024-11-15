@@ -1,0 +1,248 @@
+version: "3.8"
+services:
+  oathkeeper:
+    container_name: ${COMPOSE_PROJECT_NAME}_oathkeeper
+    image: oryd/oathkeeper:v0.40.7
+    env_file:
+      - ../config/development.env
+    ports:
+      - "4455:4455"
+      - "4456:4456"
+    environment:
+      - LOG_LEVEL=${OATHKEEPER_LOG_LEVEL}
+      - LOG_FORMAT=${OATHKEEPER_LOG_FORMAT}
+    command: serve proxy -c "/etc/config/oathkeeper/oathkeeper.yml"
+    volumes:
+      - type: bind
+        source: ./configs/oathkeeper
+        target: /etc/config/oathkeeper
+    restart: on-failure
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  kratos-migrate:
+    container_name: ${COMPOSE_PROJECT_NAME}_kratos-migrate
+    image: oryd/kratos:v1.3.1
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${KRATOS_DSN}
+      - LOG_LEVEL=${KRATOS_LOG_LEVEL}
+      - LOG_FORMAT=${KRATOS_LOG_FORMAT}
+    volumes:
+      - type: bind
+        source: ./configs/kratos
+        target: /etc/config/kratos
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  kratos:
+    container_name: ${COMPOSE_PROJECT_NAME}_kratos
+    depends_on:
+      - kratos-migrate
+    image: oryd/kratos:v1.3.1
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${KRATOS_DSN}
+      - LOG_LEVEL=${KRATOS_LOG_LEVEL}
+      - LOG_FORMAT=${KRATOS_LOG_FORMAT}
+    ports:
+      - "4433:4433"
+      - "4434:4434"
+    command: >
+      serve -c /etc/config/kratos/kratos.yml 
+      ${DEV_MODE:+--dev --watch-courier}
+    volumes:
+      - type: bind
+        source: ./configs/kratos
+        target: /etc/config/kratos
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  hydra-migrate:
+    container_name: ${COMPOSE_PROJECT_NAME}_hydra_migrate
+    image: oryd/hydra:v2.2.0
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${HYDRA_DSN}
+      - LOG_LEVEL=${HYDRA_LOG_LEVEL}
+      - LOG_FORMAT=${HYDRA_LOG_FORMAT}
+    command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    volumes:
+      - type: bind
+        source: ./configs/hydra
+        target: /etc/config/hydra
+    restart: on-failure
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  hydra:
+    container_name: ${COMPOSE_PROJECT_NAME}_hydra
+    image: oryd/hydra:v2.2.0
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${HYDRA_DSN}
+      - LOG_LEVEL=${HYDRA_LOG_LEVEL}
+      - LOG_FORMAT=${HYDRA_LOG_FORMAT}
+    ports:
+      - "4444:4444"
+      - "4445:4445"
+      - "5555:5555"
+    command: >
+      serve -c /etc/config/hydra/hydra.yml all
+      ${DEV_MODE:+--dev}
+    volumes:
+      - type: bind
+        source: ./configs/hydra
+        target: /etc/config/hydra
+    restart: unless-stopped
+    depends_on:
+      - hydra-migrate
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  keto-migrate:
+    container_name: ${COMPOSE_PROJECT_NAME}_keto_migrate
+    image: oryd/keto:v0.12.0
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${KETO_DSN}
+      - LOG_LEVEL=${KETO_LOG_LEVEL}
+      - LOG_FORMAT=${KETO_LOG_FORMAT}
+    volumes:
+      - type: bind
+        source: ./configs/keto
+        target: /home/ory
+    command: ["migrate", "up", "-y"]
+    restart: on-failure
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  keto:
+    container_name: ${COMPOSE_PROJECT_NAME}_keto
+    image: oryd/keto:v0.12.0
+    env_file:
+      - ../config/development.env
+    environment:
+      - DSN=${KETO_DSN}
+      - LOG_LEVEL=${KETO_LOG_LEVEL}
+      - LOG_FORMAT=${KETO_LOG_FORMAT}
+      - LOG_LEAK_SENSITIVE_VALUES=true
+    volumes:
+      - type: bind
+        source: ./configs/keto
+        target: /home/ory
+    ports:
+      - "4466:4466"
+      - "4467:4467"
+    depends_on:
+      - keto-migrate
+    networks:
+      - intranet
+    command: serve
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4466/health/ready",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  postgres:
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    image: postgres:14-alpine
+    env_file:
+      - ../config/development.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backup:/backup
+    networks:
+      - intranet
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          memory: 512M
+
+volumes:
+  postgres_data:
+  postgres_backup:
+
+networks:
+  intranet:
+    driver: bridge
+
+logging:
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
