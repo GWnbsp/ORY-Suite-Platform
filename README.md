@@ -1,4 +1,3 @@
-```markdown
 # ORY-Suite-Platform
 
 <p align="center">
@@ -19,7 +18,6 @@
 - 📝 详细的示例代码
 
 ## 项目结构
-```
 
 .
 ├── docker/ # Docker 相关配置
